@@ -160,6 +160,24 @@ function handleMessage(conn: Connection, msg: ClientMessage): void {
       break;
     }
 
+    case "chat": {
+      const room = conn.roomId ? getRoom(conn.roomId) : undefined;
+      if (!room || !room.members.has(conn.uid)) return;
+      const text = msg.text.trim().slice(0, 500);
+      if (!text) return;
+      broadcast(room.id, {
+        type: "chat_message",
+        message: {
+          id: `${conn.uid}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          uid: conn.uid,
+          name: conn.name,
+          text,
+          at: Date.now(),
+        },
+      });
+      break;
+    }
+
     case "leave_room": {
       leaveRoom(conn);
       break;

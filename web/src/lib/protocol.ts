@@ -11,7 +11,16 @@ export type ClientMessage =
   | { type: "join_response"; targetUid: string; accept: boolean }
   | { type: "control"; action: ControlAction }
   | { type: "sync_request" }
+  | { type: "chat"; text: string }
   | { type: "leave_room" };
+
+export interface ChatMessage {
+  id: string;
+  uid: string;
+  name: string;
+  text: string;
+  at: number;
+}
 
 export interface PublicMember { uid: string; name: string; isHost: boolean; }
 
@@ -34,4 +43,5 @@ export type ServerMessage =
   | { type: "members_changed"; members: PublicMember[]; hostUid: string }
   | { type: "control"; action: ControlAction; byUid: string }
   | { type: "room_state"; snapshot: RoomSnapshot }
+  | { type: "chat_message"; message: ChatMessage }
   | { type: "error"; message: string };

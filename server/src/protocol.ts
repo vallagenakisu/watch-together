@@ -26,8 +26,21 @@ export type ClientMessage =
   | { type: "control"; action: ControlAction }
   // Ask the server for the current authoritative room state (e.g. after reconnect).
   | { type: "sync_request" }
+  // Send a chat message to everyone in the room.
+  | { type: "chat"; text: string }
   // Leave the current room.
   | { type: "leave_room" };
+
+/** A chat message as broadcast to the room. */
+export interface ChatMessage {
+  /** Unique id so clients can key/dedupe. */
+  id: string;
+  uid: string;
+  name: string;
+  text: string;
+  /** Server timestamp (ms). */
+  at: number;
+}
 
 /** A member as seen by other clients (no socket, no internals). */
 export interface PublicMember {
@@ -64,4 +77,6 @@ export type ServerMessage =
   | { type: "control"; action: ControlAction; byUid: string }
   // Full state, e.g. response to sync_request.
   | { type: "room_state"; snapshot: RoomSnapshot }
+  // A chat message from a room member.
+  | { type: "chat_message"; message: ChatMessage }
   | { type: "error"; message: string };

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getName, getUid } from "./identity";
-import type { ClientMessage, ControlAction, PublicMember, RoomSnapshot, ServerMessage } from "./protocol";
+import type { ChatMessage, ClientMessage, ControlAction, PublicMember, RoomSnapshot, ServerMessage } from "./protocol";
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8080";
 
@@ -19,11 +19,13 @@ export interface WatchParty {
   isHost: boolean;
   joinStatus: JoinStatus;
   joinRequests: JoinRequest[];
+  chatMessages: ChatMessage[];
   error: string | null;
   createRoom: (videoId?: string) => void;
   joinRoom: (roomId: string) => void;
   respondJoin: (uid: string, accept: boolean) => void;
   sendControl: (action: ControlAction) => void;
+  sendChat: (text: string) => void;
   leaveRoom: () => void;
   subscribeControl: (handler: RemoteControlHandler) => () => void;
 }
@@ -34,6 +36,7 @@ export function useWatchParty(): WatchParty {
   const [room, setRoom] = useState<RoomSnapshot | null>(null);
   const [joinStatus, setJoinStatus] = useState<JoinStatus>("idle");
   const [joinRequests, setJoinRequests] = useState<JoinRequest[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -70,6 +73,9 @@ export function useWatchParty(): WatchParty {
         break;
       }
       case "room_state": setRoom(msg.snapshot); break;
+      case "chat_message":
+        setChatMessages((msgs) => [...msgs.slice(-199), msg.message]);
+        break;
       case "error": setError(msg.message); break;
     }
   }, []);
@@ -118,7 +124,14 @@ export function useWatchParty(): WatchParty {
     setJoinRequests((reqs) => reqs.filter((r) => r.uid !== targetUid));
   }, [send]);
   const sendControl = useCallback((action: ControlAction) => send({ type: "control", action }), [send]);
-  const leaveRoom = useCallback(() => { send({ type: "leave_room" }); setRoom(null); setJoinStatus("idle"); setJoinRequests([]); }, [send]);
+  const sendChat = useCallback((text: string) => {
+    const clean = text.trim();
+    if (clean) send({ type: "chat", text: clean });
+  }, [send]);
+  const leaveRoom = useCallback(() => {
+    send({ type: "leave_room" });
+    setRoom(null); setJoinStatus("idle"); setJoinRequests([]); setChatMessages([]);
+  }, [send]);
   const subscribeControl = useCallback((handler: RemoteControlHandler) => {
     controlHandlers.current.add(handler);
     return () => { controlHandlers.current.delete(handler); };
@@ -126,6 +139,7 @@ export function useWatchParty(): WatchParty {
 
   return {
     uid, status, room, members: room?.members ?? [], isHost: !!room && room.hostUid === uid,
-    joinStatus, joinRequests, error, createRoom, joinRoom, respondJoin, sendControl, leaveRoom, subscribeControl,
+    joinStatus, joinRequests, chatMessages, error,
+    createRoom, joinRoom, respondJoin, sendControl, sendChat, leaveRoom, subscribeControl,
   };
 }

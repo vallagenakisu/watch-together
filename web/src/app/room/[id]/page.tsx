@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useParty } from "@/components/WatchPartyProvider";
 import { SyncedPlayer } from "@/components/SyncedPlayer";
 import { SearchPanel } from "@/components/SearchPanel";
+import { ChatPanel } from "@/components/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -127,6 +128,13 @@ export default function RoomPage() {
                   {m.isHost && <Badge variant="secondary" className="ml-auto text-xs">host</Badge>}
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card className="flex h-80 flex-col">
+            <CardHeader><CardTitle className="text-base">Chat</CardTitle></CardHeader>
+            <CardContent className="flex-1 overflow-hidden">
+              <ChatPanel messages={party.chatMessages} myUid={party.uid} onSend={party.sendChat} />
             </CardContent>
           </Card>
 
