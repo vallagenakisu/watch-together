@@ -1,0 +1,20 @@
+{
+  "name": "watch-together-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WebSocket server that keeps YouTube playback in sync across a room",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.12",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
