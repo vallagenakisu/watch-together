@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"console.log\\(require\\('e:/Youtube Share/web/node_modules/next/package.json'\\).version\\)\")",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

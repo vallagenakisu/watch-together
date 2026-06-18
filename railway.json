@@ -3,5 +3,9 @@
   "build": {
     "builder": "nixpacks",
     "rootDirectory": "server"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "npm start"
   }
 }

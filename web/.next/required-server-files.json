@@ -63,7 +63,12 @@
           "search": ""
         }
       ],
-      "remotePatterns": [],
+      "remotePatterns": [
+        {
+          "protocol": "https",
+          "hostname": "i.ytimg.com"
+        }
+      ],
       "qualities": [
         75
       ],
